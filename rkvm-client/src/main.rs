@@ -63,6 +63,8 @@ async fn main() -> ExitCode {
         xdg_runtime_dir: config.xdg_runtime_dir.unwrap_or(String::new()).clone(),
         wayland_display: config.wayland_display.unwrap_or(String::new()).clone(),
         piknik_config_path: config.piknik_config_path.unwrap_or(String::new()).clone(),
+        piknik_bin_name: config.piknik_bin_name.unwrap_or(String::new()).clone(),
+        piknik_path: config.piknik_path.unwrap_or(String::new()).clone(),
         uid : config.uid.unwrap_or(u32::MAX),
         gid : config.gid.unwrap_or(u32::MAX),
     };

@@ -11,6 +11,8 @@ pub struct ClipSyncOptions {
     pub piknik_config_path: String,
     pub uid: u32,
     pub gid: u32,
+    pub piknik_bin_name: String,
+    pub piknik_path: String
 }
 
 pub fn run_provider(clip_sync_options: &ClipSyncOptions) {
@@ -21,6 +23,8 @@ pub fn run_provider(clip_sync_options: &ClipSyncOptions) {
     .env("XDG_RUNTIME_DIR", &clip_sync_options.xdg_runtime_dir)
     .env("WAYLAND_DISPLAY", &clip_sync_options.wayland_display)
     .env("PIKNIK_CONFIG", &clip_sync_options.piknik_config_path)
+    .env("PIKNIK_BIN_NAME", &clip_sync_options.piknik_bin_name)
+    .env("PIKNIK_PATH", &clip_sync_options.piknik_path)
     .uid(clip_sync_options.uid)
     .gid(clip_sync_options.gid)
     .stdout(stdio)

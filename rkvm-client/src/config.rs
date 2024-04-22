@@ -19,7 +19,9 @@ pub struct Config {
     pub wayland_display: Option<String>,
     pub uid: Option<u32>,
     pub gid: Option<u32>,
-    pub piknik_config_path: Option<String> 
+    pub piknik_config_path: Option<String>, 
+    pub piknik_bin_name: Option<String>,
+    pub piknik_path: Option<String>
 }
 
 pub struct Server {
