@@ -395,7 +395,6 @@ async fn client(
 
         let update = match update {
             Some(Update::ClientNotify { code: _ }) => {
-                println!("SSSSSSSSSSUCCCCCCCESSSSS");
                 if clipsync_opts.clip_sync_enabled == true {
                     clipsync::run_provider(clipsync_opts);
                 }
