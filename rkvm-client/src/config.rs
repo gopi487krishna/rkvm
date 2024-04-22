@@ -12,6 +12,14 @@ pub struct Config {
     pub server: Server,
     pub certificate: PathBuf,
     pub password: String,
+    // For clipsync
+    pub clipsync_enabled: Option<bool>,
+    pub sync_provider_path: Option<String>,
+    pub xdg_runtime_dir: Option<String>,
+    pub wayland_display: Option<String>,
+    pub uid: Option<u32>,
+    pub gid: Option<u32>,
+    pub piknik_config_path: Option<String> 
 }
 
 pub struct Server {

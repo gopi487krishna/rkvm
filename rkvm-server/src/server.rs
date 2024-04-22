@@ -22,6 +22,7 @@ use tokio::sync::mpsc::{self, Receiver, Sender};
 use tokio::time;
 use tokio_rustls::TlsAcceptor;
 use tracing::Instrument;
+use rkvm_input::clipsync;
 
 #[derive(Error, Debug)]
 pub enum Error {
@@ -39,6 +40,7 @@ pub async fn run(
     password: &str,
     switch_keys: &HashSet<Key>,
     propagate_switch_keys: bool,
+    clipsync_opts: &clipsync::ClipSyncOptions
 ) -> Result<(), Error> {
     let listener = TcpListener::bind(&listen).await.map_err(Error::Network)?;
     tracing::info!("Listening on {}", listen);
@@ -61,6 +63,7 @@ pub async fn run(
                 let (stream, addr) = result.map_err(Error::Network)?;
                 let acceptor = acceptor.clone();
                 let password = password.to_owned();
+                let clipsync_opts = clipsync_opts.clone();
 
                 // Remove dead clients.
                 clients.retain(|_, (client, _)| !client.is_closed());
@@ -92,7 +95,7 @@ pub async fn run(
                     async move {
                         tracing::info!("Connected");
 
-                        match client(init_updates, receiver, stream, acceptor, &password).await {
+                        match client(init_updates, receiver, stream, acceptor, &password, &clipsync_opts).await {
                             Ok(()) => tracing::info!("Disconnected"),
                             Err(err) => tracing::error!("Disconnected: {}", err),
                         }
@@ -215,11 +218,20 @@ pub async fn run(
                             previous = idx;
                             changed = true;
 
+                            let client_index:usize;
+
                             if current != 0 {
                                 tracing::info!(idx = %current, addr = %clients[current - 1].1, "Switched client");
+                                client_index = current-1;
                             } else {
                                 tracing::info!(idx = %current, "Switched client");
+                                client_index = current;
                             }
+
+                            if clients[client_index].0.send(Update::ClientNotify {code: 487}).await.is_err() {
+                                tracing::info!("Error");
+                            }
+
                         } else if changed {
                             idx = previous;
 
@@ -308,6 +320,7 @@ async fn client(
     stream: TcpStream,
     acceptor: TlsAcceptor,
     password: &str,
+    clipsync_opts: &clipsync::ClipSyncOptions
 ) -> Result<(), ClientError> {
     let stream = rkvm_net::timeout(rkvm_net::TLS_TIMEOUT, acceptor.accept(stream)).await?;
     tracing::info!("TLS connected");
@@ -381,6 +394,13 @@ async fn client(
         };
 
         let update = match update {
+            Some(Update::ClientNotify { code: _ }) => {
+                println!("SSSSSSSSSSUCCCCCCCESSSSS");
+                if clipsync_opts.clip_sync_enabled == true {
+                    clipsync::run_provider(clipsync_opts);
+                }
+                update.unwrap()
+            },
             Some(update) => update,
             None => break,
         };

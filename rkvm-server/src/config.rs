@@ -13,6 +13,14 @@ pub struct Config {
     pub password: String,
     pub switch_keys: HashSet<SwitchKey>,
     pub propagate_switch_keys: Option<bool>,
+    // Clipboard syncing wayrkvm
+    pub clipsync_enabled: Option<bool>,
+    pub sync_provider_path: Option<String>,
+    pub xdg_runtime_dir: Option<String>,
+    pub wayland_display: Option<String>,
+    pub piknik_config_path: Option<String>,
+    pub uid: Option<u32>,
+    pub gid: Option<u32>,
 }
 
 #[derive(Deserialize, Clone, Copy, PartialEq, Eq, Hash)]

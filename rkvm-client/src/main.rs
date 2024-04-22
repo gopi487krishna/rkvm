@@ -11,6 +11,7 @@ use tracing::subscriber;
 use tracing_subscriber::filter::{EnvFilter, LevelFilter};
 use tracing_subscriber::fmt;
 use tracing_subscriber::prelude::*;
+use rkvm_input::clipsync;
 
 #[derive(Parser)]
 #[structopt(name = "rkvm-client", about = "The rkvm client application")]
@@ -56,8 +57,18 @@ async fn main() -> ExitCode {
         }
     };
 
+    let clipsync_opts = clipsync::ClipSyncOptions {
+        clip_sync_enabled: config.clipsync_enabled.unwrap_or(false),
+        sync_provider_path: config.sync_provider_path.unwrap_or(String::new()).clone(),
+        xdg_runtime_dir: config.xdg_runtime_dir.unwrap_or(String::new()).clone(),
+        wayland_display: config.wayland_display.unwrap_or(String::new()).clone(),
+        piknik_config_path: config.piknik_config_path.unwrap_or(String::new()).clone(),
+        uid : config.uid.unwrap_or(u32::MAX),
+        gid : config.gid.unwrap_or(u32::MAX),
+    };
+
     tokio::select! {
-        result = client::run(&config.server.hostname, config.server.port, connector, &config.password) => {
+        result = client::run(&config.server.hostname, config.server.port, connector, &config.password, &clipsync_opts) => {
             if let Err(err) = result {
                 tracing::error!("Error: {}", err);
                 return ExitCode::FAILURE;

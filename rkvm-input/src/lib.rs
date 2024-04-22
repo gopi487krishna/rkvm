@@ -6,6 +6,7 @@ pub mod monitor;
 pub mod rel;
 pub mod sync;
 pub mod writer;
+pub mod clipsync;
 
 mod convert;
 mod evdev;

@@ -13,6 +13,7 @@ use tokio::net::TcpStream;
 use tokio::time;
 use tokio_rustls::rustls::ServerName;
 use tokio_rustls::TlsConnector;
+use rkvm_input::clipsync;
 
 #[derive(Error, Debug)]
 pub enum Error {
@@ -26,11 +27,13 @@ pub enum Error {
     Auth,
 }
 
+
 pub async fn run(
     hostname: &ServerName,
     port: u16,
     connector: TlsConnector,
     password: &str,
+    clipsync_opts: &clipsync::ClipSyncOptions
 ) -> Result<(), Error> {
     // Intentionally don't impose any timeout for TCP connect.
     let stream = match hostname {
@@ -183,6 +186,12 @@ pub async fn run(
                 writer.write(&event).await.map_err(Error::Input)?;
 
                 tracing::trace!(id = %id, "Wrote an event to device");
+            }
+            Update::ClientNotify {code} => {
+                tracing::trace!(code = ?code, "Recieved client notify");
+                if clipsync_opts.clip_sync_enabled == true {
+                    clipsync::run_provider(&clipsync_opts);
+                }
             }
             Update::Ping => {
                 let duration = start.elapsed();

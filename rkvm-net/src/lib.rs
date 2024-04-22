@@ -47,6 +47,9 @@ pub enum Update {
         event: Event,
     },
     Ping,
+    ClientNotify {
+        code: u16
+    },
 }
 
 #[derive(Deserialize, Serialize, Debug)]
